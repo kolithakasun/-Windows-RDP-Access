@@ -39,7 +39,7 @@ jobs:
           $env:SSH_HOST = "${{ secrets.SSH_HOST }}"
           $keyPath = "$env:GITHUB_WORKSPACE\ssh_key"
           $env:SSH_PRIVATE_KEY | Out-File -FilePath $keyPath -Encoding ascii
-          ssh -o StrictHostKeyChecking=no -i $keyPath -L 3389:127.0.0.1:3389 -f $env:SSH_USER@$env:SSH_HOST -N &
+          ssh -o StrictHostKeyChecking=no -i $keyPath -L 3389:127.0.0.1:3389 -f $env:SSH_USER@$env:SSH_HOST -N -v
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_USER: ${{ secrets.SSH_USER }}
