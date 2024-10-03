@@ -29,5 +29,8 @@ jobs:
       - name: Install localtunnel
         run: npm install -g localtunnel
 
+      - name: Install localtunnel
+        run: curl https://loca.lt/mytunnelpassword
+
       - name: Start localtunnel
         run: lt --port 3389 --subdomain myrdptunnel
