@@ -21,9 +21,13 @@ jobs:
           New-LocalUser -Name "newuser" -Password $password -FullName "New User" -Description "RDP User"
           Add-LocalGroupMember -Group "Administrators" -Member "newuser"
 
-      - name: Download Serveo script
-        run: Invoke-WebRequest -Uri https://serveo.net -OutFile serveo.ps1
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
-      - name: Start Serveo tunnel
-        run: |
-          Start-Process powershell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File serveo.ps1 -RDP 3389'
+      - name: Install localtunnel
+        run: npm install -g localtunnel
+
+      - name: Start localtunnel
+        run: lt --port 3389 --subdomain myrdptunnel
