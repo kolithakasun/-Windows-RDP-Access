@@ -34,7 +34,12 @@ jobs:
 
       - name: Create SSH tunnel
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} -L 3389:localhost:3389 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -N &
+          $env:SSH_PRIVATE_KEY = "${{ secrets.SSH_PRIVATE_KEY }}"
+          $env:SSH_USER = "${{ secrets.SSH_USER }}"
+          $env:SSH_HOST = "${{ secrets.SSH_HOST }}"
+          $keyPath = "$env:GITHUB_WORKSPACE\ssh_key"
+          $env:SSH_PRIVATE_KEY | Out-File -FilePath $keyPath -Encoding ascii
+          ssh -o StrictHostKeyChecking=no -i $keyPath -L 3389:localhost:3389 $env:SSH_USER@$env:SSH_HOST -N &
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_USER: ${{ secrets.SSH_USER }}
