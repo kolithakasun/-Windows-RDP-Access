@@ -1,0 +1,41 @@
+name: Windows RDP Access with SSH Tunnel
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Enable RDP
+        run: |
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+
+      - name: Create new user
+        run: |
+          $password = ConvertTo-SecureString "ComplexP@ssw0rd123" -AsPlainText -Force
+          New-LocalUser -Name "newuser" -Password $password -FullName "New User" -Description "RDP User"
+          Add-LocalGroupMember -Group "Administrators" -Member "newuser"
+
+      - name: Install OpenSSH
+        run: Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+
+      - name: Start SSH service
+        run: Start-Service sshd
+
+      - name: Configure SSH
+        run: |
+          Set-Service -Name sshd -StartupType 'Automatic'
+          New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+
+      - name: Create SSH tunnel
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} -L 3389:localhost:3389 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -N &
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
