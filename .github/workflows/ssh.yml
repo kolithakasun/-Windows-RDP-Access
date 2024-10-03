@@ -21,16 +21,16 @@ jobs:
           New-LocalUser -Name "newuser" -Password $password -FullName "New User" -Description "RDP User"
           Add-LocalGroupMember -Group "Administrators" -Member "newuser"
 
-      - name: Install OpenSSH
-        run: Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+      # - name: Install OpenSSH
+      #   run: Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
 
-      - name: Start SSH service
-        run: Start-Service sshd
+      # - name: Start SSH service
+      #   run: Start-Service sshd
 
-      - name: Configure SSH
-        run: |
-          Set-Service -Name sshd -StartupType 'Automatic'
-          New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+      # - name: Configure SSH
+      #   run: |
+      #     Set-Service -Name sshd -StartupType 'Automatic'
+      #     New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
 
       - name: Create SSH tunnel
         run: |
